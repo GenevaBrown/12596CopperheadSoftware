@@ -14,7 +14,7 @@ public class TestSuperAuto extends AutoMode {
 
     void runAutoMode () {
         waitForStart();
-        SuperAuto(true, true, true, false, false);
+        SuperAuto(true, true, false, false, false);
 
     }
 }

@@ -4,6 +4,8 @@ package org.firstinspires.ftc.teamcode;
  * Created by arvindv on 9/25/17.
  */
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -15,7 +17,13 @@ import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.Func;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
+import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
@@ -202,15 +210,62 @@ public abstract class AutoMode extends LinearOpMode {
             sleep(50);
         }
     public int Vuforia () {
-        vuforia = new Decoder(hardwareMap, "AYx3Kw3/////AAAAGQreNEJhLkdWqUbBsQ06dnWIksoccLxh/R9WNkXB8hvuonWmFXUWJ2tYqM+8VqYCWXkHfanXzG/G1un7ZvwgGkkO6u0ktevZDb8AFWF2/Y4wVH1BWGQ2psV5QkHAKZ7Z6ThZI01HPZqixiQowyeUstv7W/QU8jJ48NrqGBLVYdE6eFfzNDzVY/1IvrBJaRwqKR8vo+3a2zmeFEnEhFTqMI7anU2WSPy8RP7tR61CdfidjL2biMe0RiSOBIbqOe4rs9NGaDvp1Crtz17uyY71GyMkp+Kmjbejyfj8LgZ/dZQoEsuVuQyo0dbd4KBxsEJlQj/uAEst22QoEwZe0Af4DnFtwn6/IEe02L3DT3/Np+ZX");
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
+
+
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+        parameters.loggingEnabled = true;
+        parameters.loggingTag = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
+        // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
+        // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
+        // and named "imu".
+
+        // Set up our telemetry dashboard
+
+        // Wait until we're told to go
+
+        // Start the logging of measured acceleration
+
+
+
+        // Wait for the game to start (driver presses PLAY)
+        vuforia.start();
+        sleep (1000);
+
+        // run until the end of the match (driver presses STOP)
+
+
+
+            // Show the elapsed game time and wheel power.
+            telemetry.addData("Status", "Target: " + vuforia.getDecodedColumn());
+            telemetry.addData("Status", "Name: " + vuforia.getMark().name());
+            telemetry.update();
+            sleep (1000);
+            int decodedColumn = vuforia.getDecodedColumn();
+//            vuforia.stop();
+
+
+
+
+        return decodedColumn;
+
+
+
+    }
+        /*vuforia = new Decoder(hardwareMap, "AYx3Kw3/////AAAAGQreNEJhLkdWqUbBsQ06dnWIksoccLxh/R9WNkXB8hvuonWmFXUWJ2tYqM+8VqYCWXkHfanXzG/G1un7ZvwgGkkO6u0ktevZDb8AFWF2/Y4wVH1BWGQ2psV5QkHAKZ7Z6ThZI01HPZqixiQowyeUstv7W/QU8jJ48NrqGBLVYdE6eFfzNDzVY/1IvrBJaRwqKR8vo+3a2zmeFEnEhFTqMI7anU2WSPy8RP7tR61CdfidjL2biMe0RiSOBIbqOe4rs9NGaDvp1Crtz17uyY71GyMkp+Kmjbejyfj8LgZ/dZQoEsuVuQyo0dbd4KBxsEJlQj/uAEst22QoEwZe0Af4DnFtwn6/IEe02L3DT3/Np+ZX");
         RelicRecoveryVuMark vuMark = vuforia.getMark();
         //if that doesn't work uncoment that out and put back in decoded column
         vuforia.start();
-        return vuforia.getDecodedColumn();
-    }
+        return vuforia.getDecodedColumn();*/
+
     public void SuperAuto (boolean blue, boolean left, boolean glyph, boolean threeGlyphs, boolean hDrive) {
         int direction;
-        int vuforiaColumn = 0;
         if (blue) {
             direction = 1;
         } else {
@@ -218,27 +273,18 @@ public abstract class AutoMode extends LinearOpMode {
         }
             double initJewelSwiperPos = jewelSwiper.getPosition();
             int glyphPosition = -1;
-            jewelSwiper.setPosition(0);
+            jewelSwiper.setPosition(0.48);
             jewel2.setPosition(0.5);
             lHDrive.setPosition(0.5);
             rHDrive.setPosition(0.5);
+            vuforia = new Decoder(hardwareMap, "AYx3Kw3/////AAAAGQreNEJhLkdWqUbBsQ06dnWIksoccLxh/R9WNkXB8hvuonWmFXUWJ2tYqM+8VqYCWXkHfanXzG/G1un7ZvwgGkkO6u0ktevZDb8AFWF2/Y4wVH1BWGQ2psV5QkHAKZ7Z6ThZI01HPZqixiQowyeUstv7W/QU8jJ48NrqGBLVYdE6eFfzNDzVY/1IvrBJaRwqKR8vo+3a2zmeFEnEhFTqMI7anU2WSPy8RP7tR61CdfidjL2biMe0RiSOBIbqOe4rs9NGaDvp1Crtz17uyY71GyMkp+Kmjbejyfj8LgZ/dZQoEsuVuQyo0dbd4KBxsEJlQj/uAEst22QoEwZe0Af4DnFtwn6/IEe02L3DT3/Np+ZX");
             waitForStart();
                 double jewelSwiperCurrentPos = jewelSwiper.getPosition();
-                Vuforia();
-                sleep(2000);
-                if (Vuforia() == 1) {
-                    vuforiaColumn = 1;
-                }
-                if (Vuforia() == 2) {
-                    vuforiaColumn = 2;
-                }
-                if (Vuforia() == 3) {
-                    vuforiaColumn = 3;
-                }
-                vuforia.stop();
+                int vuforiaColumn = Vuforia();
                 telemetry.addData("Vuforia Column: ", Vuforia());
+                telemetry.addData("Vuforia Column Saved", vuforiaColumn);
                 telemetry.update();
-                jewelSwiper.setPosition(.5);
+                jewelSwiper.setPosition(.43);
                 sleep(1500);
 
                 if (isJewelRed() == true) {

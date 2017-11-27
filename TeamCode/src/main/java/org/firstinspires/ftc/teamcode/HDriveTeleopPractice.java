@@ -62,8 +62,8 @@ public class HDriveTeleopPractice extends LinearOpMode {
 
         lHDrive.setPosition(0.3);
         rHDrive.setPosition(0.7);
-        jewelSwiper.setPosition(1);
-        jewel2.setPosition(0.5);
+        jewelSwiper.setPosition(0.5);
+        jewel2.setPosition(0.95);
 
         waitForStart();
 
