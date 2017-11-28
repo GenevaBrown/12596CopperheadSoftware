@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 /**
  * Created by HP 15t-as100 on 9/25/2017.
  */
-@Autonomous (name = "TestSuperAutoBlueLt", group = "12596")
+@Autonomous (name = "TestSuperAutoRedLt", group = "12596")
 public class TestSuperAuto extends AutoMode {
 
     @Override
@@ -14,7 +14,7 @@ public class TestSuperAuto extends AutoMode {
 
     void runAutoMode () {
         waitForStart();
-        SuperAuto(true, true, false, false, false);
+        SuperAuto(false, true, true, false, false, false);
 
     }
 }

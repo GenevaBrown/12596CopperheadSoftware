@@ -96,7 +96,7 @@ public abstract class AutoMode extends LinearOpMode {
     public void goTurn (double anglesToGo, double power, boolean liftCWheel) {
         double startHeading = 0;
         double targetHeading = anglesToGo;
-        double currentHeading = IMU.getHeading();
+        double currentHeading = IMU.getPitch();
 
         if (liftCWheel == true) {
             lHDrive.setPosition(0.6);
@@ -107,15 +107,15 @@ public abstract class AutoMode extends LinearOpMode {
             power = -power;
             anglesToGo = Math.abs(anglesToGo);
         }*/
-        startHeading = IMU.getHeading();
-        while ((Math.abs(currentHeading - startHeading) < Math.abs(targetHeading)) && opModeIsActive()) {
-            currentHeading = IMU.getHeading();
+        startHeading = IMU.getPitch();
+        while ((Math.abs(currentHeading - startHeading) < Math.abs(targetHeading + startHeading)) && opModeIsActive()) {
+            currentHeading = IMU.getPitch();
             if (targetHeading < 0) {
-                left.setPower(-power);
+                left.setPower(power);
                 right.setPower(power);
             } else if (targetHeading > 0) {
                 right.setPower(-power);
-                left.setPower(power);
+                left.setPower(-power);
             }
         }
         left.setPower(0);
@@ -246,7 +246,7 @@ public abstract class AutoMode extends LinearOpMode {
             telemetry.addData("Status", "Target: " + vuforia.getDecodedColumn());
             telemetry.addData("Status", "Name: " + vuforia.getMark().name());
             telemetry.update();
-            sleep (1000);
+            sleep (1500);
             int decodedColumn = vuforia.getDecodedColumn();
 //            vuforia.stop();
 
@@ -264,7 +264,7 @@ public abstract class AutoMode extends LinearOpMode {
         vuforia.start();
         return vuforia.getDecodedColumn();*/
 
-    public void SuperAuto (boolean blue, boolean left, boolean glyph, boolean threeGlyphs, boolean hDrive) {
+    public void SuperAuto (boolean blue, boolean left, boolean glyph, boolean threeGlyphs, boolean hDrive, boolean jewels) {
         int direction;
         if (blue) {
             direction = 1;
@@ -273,7 +273,7 @@ public abstract class AutoMode extends LinearOpMode {
         }
             double initJewelSwiperPos = jewelSwiper.getPosition();
             int glyphPosition = -1;
-            jewelSwiper.setPosition(0.48);
+            //jewelSwiper.setPosition(0.48);
             jewel2.setPosition(0.5);
             lHDrive.setPosition(0.5);
             rHDrive.setPosition(0.5);
@@ -284,38 +284,40 @@ public abstract class AutoMode extends LinearOpMode {
                 telemetry.addData("Vuforia Column: ", Vuforia());
                 telemetry.addData("Vuforia Column Saved", vuforiaColumn);
                 telemetry.update();
-                jewelSwiper.setPosition(.43);
-                sleep(1500);
+                if (jewels) {
+                    jewelSwiper.setPosition(.43);
+                    sleep(1500);
 
-                if (isJewelRed() == true) {
-                    if (blue) {
-                        jewel2.setPosition(1);
-                    } else {
-                        jewel2.setPosition(0);
-                    }
-                    sleep(2000);
-                    jewelSwiper.setPosition(1);
+                    if (isJewelRed() == true) {
+                        if (blue) {
+                            jewel2.setPosition(1);
+                        } else {
+                            jewel2.setPosition(0);
+                        }
+                        sleep(2000);
+                        jewelSwiper.setPosition(1);
 
-                } else if (isJewelRed() == false) {
-                    if (blue) {
-                        jewel2.setPosition(0);
-                    } else {
-                        jewel2.setPosition(1);
+                    } else if (isJewelRed() == false) {
+                        if (blue) {
+                            jewel2.setPosition(0);
+                        } else {
+                            jewel2.setPosition(1);
+                        }
+                        sleep(2000);
+                        jewelSwiper.setPosition(1);
                     }
-                    sleep(2000);
-                    jewelSwiper.setPosition(1);
+                    sleep(1000);
                 }
-                sleep(1000);
                 if (glyph) {
                     if (!hDrive) {
                        if (vuforiaColumn == 1) {
-                           goDistance(22, .7 * direction , true);
+                           goDistance(25, .7 * direction , true);
                        }
                        else if (vuforiaColumn == 2) {
-                           goDistance(30, .7 * direction, true);
+                           goDistance(33, .7 * direction, true);
                        }
                        else if (vuforiaColumn == 3) {
-                           goDistance(38, .7 * direction, true);
+                           goDistance(41, .7 * direction, true);
                        }
                         goTurn(85, .7 * direction, true);
                         goDistance(10, .7, true);
