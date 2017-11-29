@@ -94,9 +94,10 @@ public abstract class AutoMode extends LinearOpMode {
         right.setPower(0);
     }
     public void goTurn (double anglesToGo, double power, boolean liftCWheel) {
-        double startHeading = 0;
+        double startHeading = IMU.getPitch();
         double targetHeading = anglesToGo;
         double currentHeading = IMU.getPitch();
+        double previousHeading = startHeading;
 
         if (liftCWheel == true) {
             lHDrive.setPosition(0.6);
@@ -107,9 +108,15 @@ public abstract class AutoMode extends LinearOpMode {
             power = -power;
             anglesToGo = Math.abs(anglesToGo);
         }*/
-        startHeading = IMU.getPitch();
-        while ((Math.abs(currentHeading - startHeading) < Math.abs(targetHeading + startHeading)) && opModeIsActive()) {
-            currentHeading = IMU.getPitch();
+        double jumpAngle = 0;
+        while ((Math.abs(currentHeading - startHeading) < Math.abs(targetHeading)) && opModeIsActive()) {
+            currentHeading = IMU.getPitch() + jumpAngle;
+            if (currentHeading > 180 + previousHeading) {
+                jumpAngle = -360;
+            }
+            if (currentHeading < previousHeading - 180) {
+                jumpAngle = 360;
+            }
             if (targetHeading < 0) {
                 left.setPower(power);
                 right.setPower(power);
@@ -117,6 +124,23 @@ public abstract class AutoMode extends LinearOpMode {
                 right.setPower(-power);
                 left.setPower(-power);
             }
+            //To slow down before the end of turns -- Needs to be tested!!
+          /*  if (Math.abs(targetHeading - currentHeading) < 15) {
+                double slowDownPower = (power * (Math.abs(targetHeading - currentHeading) / 15));
+                if (power > 0) {
+                    slowDownPower = slowDownPower + 0.2;
+                }
+                if (power < 0) {
+                    slowDownPower = slowDownPower - 0.2;
+                }
+                left.setPower(slowDownPower);
+                right.setPower(slowDownPower);
+                if (Math.abs(slowDownPower) > Math.abs(power)) {
+                    left.setPower(power);
+                    right.setPower(power);
+                }
+            }*/
+            previousHeading = currentHeading;
         }
         left.setPower(0);
         right.setPower(0);
@@ -308,33 +332,38 @@ public abstract class AutoMode extends LinearOpMode {
                     }
                     sleep(1000);
                 }
+                //WHEN H-DRIVE IS BACK(if that ever happens) YOU NEED TO ADD BACK IN THE TRUE'S FOR GO DISTANCE AND GO TURN
                 if (glyph) {
+                    //omnipulatorRt.setPower(0.6);
+                    //omnipulatorLt.setPower(0.6);
                     if (!hDrive) {
                        if (vuforiaColumn == 1) {
-                           goDistance(25, .7 * direction , true);
+                           goDistance(42, .7 * direction , false);
                        }
                        else if (vuforiaColumn == 2) {
-                           goDistance(33, .7 * direction, true);
+                           goDistance(33, .7 * direction, false);
                        }
                        else if (vuforiaColumn == 3) {
-                           goDistance(41, .7 * direction, true);
+                           goDistance(25, .7 * direction, false);
                        }
-                        goTurn(85, .7 * direction, true);
-                        goDistance(10, .7, true);
+                        goTurn(110, .7 * direction, false);
+                        goDistance(16, .7, false);
+                        //omnipulatorRt.setPower(0);
+                        //omnipulatorLt.setPower(0);
                         omniPusher.setPosition(1);
                         sleep(2000);
                         omniPusher.setPosition(0);
                         sleep(2000);
-                        goDistance(10, -.5, true);
+                        goDistance(10, -.5, false);
                         stop();
                     }
                     else {
                         if (blue && left || !blue && !left) {
-                            goDistance(30, .9 * direction, true);
+                            goDistance(30, .9 * direction, false);
                         }
                         if (blue && !left || !blue && left) {
-                            goDistance(15, .9 * direction, true);
-                            goTurn(90, -0.7, true);
+                            goDistance(15, .9 * direction, false);
+                            goTurn(90, -0.7, false);
                         }
                         if (vuforiaColumn == 1) {
                             goDistanceCenter(4, .5 * direction);
