@@ -10,25 +10,9 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorController;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.hardware.Servo;
-
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
-import org.firstinspires.ftc.robotcore.external.Func;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
-import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
-
-import static android.R.attr.key;
 
 public abstract class AutoMode extends LinearOpMode {
 
@@ -44,9 +28,11 @@ public abstract class AutoMode extends LinearOpMode {
     CRServo omnipulatorLt;
     Servo jewelSwiper;
     Servo jewel2;
-    Servo lHDrive;
-    Servo rHDrive;
-    Servo omniPusher;
+    //Servo lHDrive;
+    //Servo rHDrive;
+    CRServo omniPusher;
+    CRServo omniPusher2;
+
 
     double dropHeight = 0.43;
 
@@ -94,39 +80,48 @@ public abstract class AutoMode extends LinearOpMode {
         right.setPower(0);
     }
     public void goTurn (double anglesToGo, double power, boolean liftCWheel) {
-        double startHeading = IMU.getPitch();
-        double targetHeading = anglesToGo;
-        double currentHeading = IMU.getPitch();
+        double startHeading = IMU.getHeading();
+        double targetDiff = anglesToGo;
+        double currentHeading = IMU.getHeading();
         double previousHeading = startHeading;
 
-        if (liftCWheel == true) {
+        /*if (liftCWheel == true) {
             lHDrive.setPosition(0.6);
             rHDrive.setPosition(0.4);
             sleep(500);
-        }
+        }*/
         /*if (anglesToGo < 0) {
             power = -power;
             anglesToGo = Math.abs(anglesToGo);
         }*/
         double jumpAngle = 0;
-        while ((Math.abs(currentHeading - startHeading) < Math.abs(targetHeading)) && opModeIsActive()) {
-            currentHeading = IMU.getPitch() + jumpAngle;
+        while ((Math.abs(currentHeading - startHeading) < Math.abs(targetDiff)) && opModeIsActive()) {
+            currentHeading = IMU.getHeading() + jumpAngle;
             if (currentHeading > 180 + previousHeading) {
                 jumpAngle = -360;
+                currentHeading = currentHeading + jumpAngle;
             }
             if (currentHeading < previousHeading - 180) {
                 jumpAngle = 360;
+                currentHeading = currentHeading + jumpAngle;
             }
-            if (targetHeading < 0) {
+            if (targetDiff < 0) {
                 left.setPower(power);
                 right.setPower(power);
-            } else if (targetHeading > 0) {
+            } else if (targetDiff > 0) {
                 right.setPower(-power);
                 left.setPower(-power);
             }
+            telemetry.addData("Current Heading: ", currentHeading);
+            telemetry.addData("Previous Heading: ", previousHeading);
+            telemetry.addData("Target Diff: ", targetDiff);
+            telemetry.addData("Start Heading: ", startHeading);
+            telemetry.addData("Jump Angle: ", jumpAngle);
+            telemetry.update();
+            //Repeat at start
             //To slow down before the end of turns -- Needs to be tested!!
-          /*  if (Math.abs(targetHeading - currentHeading) < 15) {
-                double slowDownPower = (power * (Math.abs(targetHeading - currentHeading) / 15));
+           /*if ((Math.abs(targetDiff) - Math.abs((currentHeading - startHeading))) < 15) {
+                double slowDownPower = (power * ((Math.abs(targetDiff) - Math.abs((currentHeading - startHeading))) / 15));
                 if (power > 0) {
                     slowDownPower = slowDownPower + 0.2;
                 }
@@ -153,8 +148,8 @@ public abstract class AutoMode extends LinearOpMode {
         int startPositionRt = 0;
 
         if(liftCWheel == true) {
-            lHDrive.setPosition(0.6);
-            rHDrive.setPosition(0.4);
+            //lHDrive.setPosition(0.6);
+            //rHDrive.setPosition(0.4);
             sleep (500);
         }
 
@@ -204,8 +199,8 @@ public abstract class AutoMode extends LinearOpMode {
     }
     public void goDistanceCenter (double distanceToGoC, double power) {
         int startPositionC = 0;
-        rHDrive.setPosition(0.5 + dropHeight);
-        lHDrive.setPosition(0.5 - dropHeight);
+        //rHDrive.setPosition(0.5 + dropHeight);
+        //HDrive.setPosition(0.5 - dropHeight);
         sleep(500);
         if (distanceToGoC < 0) {
             power = -power;
@@ -260,7 +255,7 @@ public abstract class AutoMode extends LinearOpMode {
 
         // Wait for the game to start (driver presses PLAY)
         vuforia.start();
-        sleep (1000);
+        sleep (500);
 
         // run until the end of the match (driver presses STOP)
 
@@ -270,16 +265,11 @@ public abstract class AutoMode extends LinearOpMode {
             telemetry.addData("Status", "Target: " + vuforia.getDecodedColumn());
             telemetry.addData("Status", "Name: " + vuforia.getMark().name());
             telemetry.update();
-            sleep (1500);
+            sleep (1000);
             int decodedColumn = vuforia.getDecodedColumn();
 //            vuforia.stop();
 
-
-
-
         return decodedColumn;
-
-
 
     }
         /*vuforia = new Decoder(hardwareMap, "AYx3Kw3/////AAAAGQreNEJhLkdWqUbBsQ06dnWIksoccLxh/R9WNkXB8hvuonWmFXUWJ2tYqM+8VqYCWXkHfanXzG/G1un7ZvwgGkkO6u0ktevZDb8AFWF2/Y4wVH1BWGQ2psV5QkHAKZ7Z6ThZI01HPZqixiQowyeUstv7W/QU8jJ48NrqGBLVYdE6eFfzNDzVY/1IvrBJaRwqKR8vo+3a2zmeFEnEhFTqMI7anU2WSPy8RP7tR61CdfidjL2biMe0RiSOBIbqOe4rs9NGaDvp1Crtz17uyY71GyMkp+Kmjbejyfj8LgZ/dZQoEsuVuQyo0dbd4KBxsEJlQj/uAEst22QoEwZe0Af4DnFtwn6/IEe02L3DT3/Np+ZX");
@@ -297,10 +287,10 @@ public abstract class AutoMode extends LinearOpMode {
         }
             double initJewelSwiperPos = jewelSwiper.getPosition();
             int glyphPosition = -1;
-            //jewelSwiper.setPosition(0.48);
-            jewel2.setPosition(0.5);
-            lHDrive.setPosition(0.5);
-            rHDrive.setPosition(0.5);
+            jewelSwiper.setPosition(0);
+            jewel2.setPosition(0.6);
+            //lHDrive.setPosition(0.5);
+            //rHDrive.setPosition(0.5);
             vuforia = new Decoder(hardwareMap, "AYx3Kw3/////AAAAGQreNEJhLkdWqUbBsQ06dnWIksoccLxh/R9WNkXB8hvuonWmFXUWJ2tYqM+8VqYCWXkHfanXzG/G1un7ZvwgGkkO6u0ktevZDb8AFWF2/Y4wVH1BWGQ2psV5QkHAKZ7Z6ThZI01HPZqixiQowyeUstv7W/QU8jJ48NrqGBLVYdE6eFfzNDzVY/1IvrBJaRwqKR8vo+3a2zmeFEnEhFTqMI7anU2WSPy8RP7tR61CdfidjL2biMe0RiSOBIbqOe4rs9NGaDvp1Crtz17uyY71GyMkp+Kmjbejyfj8LgZ/dZQoEsuVuQyo0dbd4KBxsEJlQj/uAEst22QoEwZe0Af4DnFtwn6/IEe02L3DT3/Np+ZX");
             waitForStart();
                 double jewelSwiperCurrentPos = jewelSwiper.getPosition();
@@ -309,8 +299,8 @@ public abstract class AutoMode extends LinearOpMode {
                 telemetry.addData("Vuforia Column Saved", vuforiaColumn);
                 telemetry.update();
                 if (jewels) {
-                    jewelSwiper.setPosition(.43);
-                    sleep(1500);
+                    jewelSwiper.setPosition(.4);
+                    sleep(2000);
 
                     if (isJewelRed() == true) {
                         if (blue) {
@@ -319,7 +309,7 @@ public abstract class AutoMode extends LinearOpMode {
                             jewel2.setPosition(0);
                         }
                         sleep(2000);
-                        jewelSwiper.setPosition(1);
+                        jewelSwiper.setPosition(0);
 
                     } else if (isJewelRed() == false) {
                         if (blue) {
@@ -328,7 +318,7 @@ public abstract class AutoMode extends LinearOpMode {
                             jewel2.setPosition(1);
                         }
                         sleep(2000);
-                        jewelSwiper.setPosition(1);
+                        jewelSwiper.setPosition(0);
                     }
                     sleep(1000);
                 }
@@ -338,22 +328,36 @@ public abstract class AutoMode extends LinearOpMode {
                     //omnipulatorLt.setPower(0.6);
                     if (!hDrive) {
                        if (vuforiaColumn == 1) {
-                           goDistance(42, .7 * direction , false);
+                           goDistance(29, .7 * direction, false);
                        }
                        else if (vuforiaColumn == 2) {
-                           goDistance(33, .7 * direction, false);
+                           goDistance(21, .7 * direction, false);
                        }
                        else if (vuforiaColumn == 3) {
-                           goDistance(25, .7 * direction, false);
+                           goDistance(14, .7 * direction, false);
                        }
-                        goTurn(110, .7 * direction, false);
-                        goDistance(16, .7, false);
+                       else if (vuforiaColumn == -1) {
+                           goDistance(29, .7 * direction, false);
+                       }
+                        sleep(1000);
+                        if (!blue) {
+                            goTurn(98, -.7 * direction, false);
+                        }
+                        if (blue) {
+                            goTurn(43, -.7 * direction, false);
+                        }
+                        sleep(1000);
+                        goDistance(18, .7, false);
                         //omnipulatorRt.setPower(0);
                         //omnipulatorLt.setPower(0);
-                        omniPusher.setPosition(1);
-                        sleep(2000);
-                        omniPusher.setPosition(0);
-                        sleep(2000);
+                        omniPusher2.setPower(.8);
+                        sleep(2500);
+                        omniPusher2.setPower(-.6);
+                        sleep(1500);
+                        goDistance(3, -.5, false);
+                        servoCollectorRt.setPower(.7);
+                        servoCollectorLt.setPower(-.7);
+                        sleep(1500);
                         goDistance(10, -.5, false);
                         stop();
                     }
@@ -372,9 +376,10 @@ public abstract class AutoMode extends LinearOpMode {
                         } else if (vuforiaColumn == 3) {
                             goDistanceCenter(12, .5 * direction);
                         }
-                        omniPusher.setPosition(1);
-                        sleep(1000);
-                        omniPusher.setPosition(0);
+                        omniPusher2.setPower(.8);
+                        sleep(1500);
+                        omniPusher2.setPower(-.6);
+                        sleep(1500);
                         goDistance(15, -.6, true);
                     }
                 } else {
@@ -434,6 +439,9 @@ public abstract class AutoMode extends LinearOpMode {
         left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         center.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        left.setDirection(DcMotorSimple.Direction.REVERSE);
+        right.setDirection(DcMotorSimple.Direction.REVERSE);
+
 
 
         left.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -441,14 +449,15 @@ public abstract class AutoMode extends LinearOpMode {
 
 
         center = hardwareMap.dcMotor.get("C");
-        lHDrive = hardwareMap.servo.get("LH");
-        rHDrive = hardwareMap.servo.get("RH");
+        //lHDrive = hardwareMap.servo.get("LH");
+        //rHDrive = hardwareMap.servo.get("RH");
         colorSensor = hardwareMap.get(ColorSensor.class, "Color");
         colorSensor.setI2cAddress(I2cAddr.create7bit(0x39));
         IMU = new IMU();
         jewelSwiper = hardwareMap.servo.get("jewelSwiper");
         jewel2 = hardwareMap.servo.get("jewel2");
-        omniPusher = hardwareMap.servo.get("pusher");
+        omniPusher2 = hardwareMap.crservo.get("pusher2");
+        omniPusher = hardwareMap.crservo.get("pusher");
 
         IMU.setup(hardwareMap);
 

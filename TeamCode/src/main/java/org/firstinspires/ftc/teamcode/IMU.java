@@ -113,6 +113,11 @@ public class IMU {
         update();
         return angles.thirdAngle;
     }
+    public double getRoll() {
+
+        update();
+        return angles.secondAngle;
+    }
 
 
 

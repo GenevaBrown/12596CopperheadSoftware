@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
  * Created by HP 15t-as100 on 9/22/2017.
@@ -19,21 +20,21 @@ public class HDriveTeleopPractice extends LinearOpMode {
     DcMotor servoCollectorRt;
     Servo jewelSwiper;
     Servo jewel2;
-    Servo lHDrive;
-    Servo rHDrive;
+    DcMotor HDrive;
     CRServo omnipulatorRt;
     CRServo omnipulatorLt;
-    Servo omniPusher;
-    Servo omniPusher2;
+    CRServo omniPusher;
+    CRServo omniPusher2;
     DcMotor omnipulatorLift;
     DigitalChannel liftStop;
+    DigitalChannel pusherStop;
+    DigitalChannel pusherStop2;
     double dropHeight = 0.43;
 
     @Override
     public void runOpMode() throws InterruptedException {
 
-        lHDrive = hardwareMap.servo.get("LH");
-        rHDrive = hardwareMap.servo.get("RH");
+        HDrive = hardwareMap.dcMotor.get("H");
         leftMotor = hardwareMap.dcMotor.get("L");
         rightMotor = hardwareMap.dcMotor.get("R");
         centerMotor = hardwareMap.dcMotor.get("C");
@@ -43,11 +44,15 @@ public class HDriveTeleopPractice extends LinearOpMode {
         jewel2 = hardwareMap.servo.get("jewel2");
         omnipulatorRt = hardwareMap.crservo.get("omnipulatorRt");
         omnipulatorLt = hardwareMap.crservo.get("omnipulatorLt");
-        omniPusher = hardwareMap.servo.get("pusher");
-        omniPusher2 = hardwareMap.servo.get("pusher2");
+        omniPusher = hardwareMap.crservo.get("pusher");
+        omniPusher2 = hardwareMap.crservo.get("pusher2");
         omnipulatorLift = hardwareMap.dcMotor.get("Lift");
         liftStop = hardwareMap.digitalChannel.get("liftStop");
         liftStop.setMode(DigitalChannel.Mode.INPUT);
+        pusherStop = hardwareMap.digitalChannel.get("pusherStop");
+        pusherStop2 = hardwareMap.digitalChannel.get("pusherStop2");
+        pusherStop.setMode(DigitalChannel.Mode.INPUT);
+        pusherStop2.setMode(DigitalChannel.Mode.INPUT);
         centerMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         //leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         //rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -60,9 +65,7 @@ public class HDriveTeleopPractice extends LinearOpMode {
         //double servoInitPositionLt = servoCollectorLt.getPosition();
         //double servoInitPositionRt = servoCollectorRt.getPosition();
 
-        lHDrive.setPosition(0.3);
-        rHDrive.setPosition(0.7);
-        jewelSwiper.setPosition(0.5);
+        jewelSwiper.setPosition(0.1);
         jewel2.setPosition(0.95);
 
         waitForStart();
@@ -75,13 +78,14 @@ public class HDriveTeleopPractice extends LinearOpMode {
             double jewel2CurrentPos = jewel2.getPosition();
             double omnipulatorLtCurrentPos = omnipulatorLt.getPower();
             double omnipulatorRtCurrentPos = omnipulatorRt.getPower();
-            double pusherCurrentPos = omniPusher.getPosition();
-            double pusher2CurrentPos = omniPusher2.getPosition();
+            //double pusherCurrentPos = omniPusher.getPosition();
+            //double pusher2CurrentPos = omniPusher2.getPosition();
             //double servoCurrentPosLt = servoCollectorLt.getPosition();
             //double servoCurrentPosRt = servoCollectorRt.getPosition();
             if (Math.abs(gamepad1.left_stick_y) > .01) {
-                lHDrive.setPosition(0.3);
-                rHDrive.setPosition(0.7);
+                /*HDrive.setPower(1);
+                sleep(750);
+                HDrive.setPower(0);*/
                 leftMotor.setPower(gamepad1.left_stick_y);
             }
             /*if (Math.abs(gamepad1.left_stick_y) > .01 && Math.abs(gamepad1.left_stick_y) < .5) {
@@ -106,21 +110,24 @@ public class HDriveTeleopPractice extends LinearOpMode {
                 rightMotor.setPower(-gamepad1.right_stick_y);
             }*/
             if (Math.abs(gamepad1.right_stick_y) > .01) {
-                lHDrive.setPosition(.3);
-                rHDrive.setPosition(.7);
+               /* HDrive.setPower(1);
+                sleep(750);
+                HDrive.setPower(0); */
                 rightMotor.setPower(-gamepad1.right_stick_y);
             }
             else {
                 rightMotor.setPower(0);
             }
             if (gamepad1.left_trigger > .05) {
-                rHDrive.setPosition(1);
-                lHDrive.setPosition(0);
+                HDrive.setPower(-1);
+                sleep(750);
+                HDrive.setPower(0);
                 centerMotor.setPower(-gamepad1.left_trigger);
             }
             else if (gamepad1.right_trigger > .05) {
-                rHDrive.setPosition(1);
-                lHDrive.setPosition(0);
+                HDrive.setPower(-1);
+                sleep(750);
+                HDrive.setPower(0);
                 centerMotor.setPower(gamepad1.right_trigger);
             }
             else {
@@ -142,16 +149,26 @@ public class HDriveTeleopPractice extends LinearOpMode {
                 omnipulatorRt.setPower(0);
             }
             if (gamepad2.y) {
-                omniPusher.setPosition(1);
+                omniPusher.setPower(.9);
+                //ElapsedTime Timer = new ElapsedTime();
             }
             else {
-                omniPusher.setPosition(0);
+                if (pusherStop.getState()) {
+                    omniPusher.setPower(-.7);
+                } else {
+                    omniPusher.setPower(0);
+                }
             }
             if (gamepad2.a) {
-                omniPusher2.setPosition(1);
+                omniPusher2.setPower(.9);
             }
             else {
-                omniPusher2.setPosition(0);
+                if (pusherStop2.getState()) {
+                    omniPusher2.setPower(-.7);
+                }
+                else {
+                    omniPusher2.setPower(0);
+                }
             }
             if (gamepad2.dpad_up) {
                 omnipulatorLift.setPower(.7);
@@ -175,10 +192,10 @@ public class HDriveTeleopPractice extends LinearOpMode {
             }
 
             if (gamepad1.dpad_up) {
-                jewelSwiper.setPosition(1);
+                jewelSwiper.setPosition(0);
             }
             else if (gamepad1.dpad_down) {
-                jewelSwiper.setPosition(.55);
+                jewelSwiper.setPosition(.4);
             }
             else{
                 jewelSwiper.setPosition(jewelSwiperCurrentPos);

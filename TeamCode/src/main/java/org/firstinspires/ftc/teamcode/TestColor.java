@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 
 /**
  * Created by HP 15t-as100 on 9/25/2017.
  */
+@Disabled
 @Autonomous (name = "TestColor", group = "12596")
 public class TestColor extends AutoMode {
 

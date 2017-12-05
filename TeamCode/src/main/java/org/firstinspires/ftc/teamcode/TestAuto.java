@@ -23,8 +23,8 @@ public class TestAuto extends AutoMode {
         telemetry.update();
         jewelSwiper.setPosition(0);
         jewel2.setPosition(0.5);
-        lHDrive.setPosition(0.5);
-        rHDrive.setPosition(0.5);
+        //lHDrive.setPosition(0.5);
+        //rHDrive.setPosition(0.5);
         while (opModeIsActive()) {
             double jewelSwiperCurrentPos = jewelSwiper.getPosition();
             vuforia.start();
@@ -57,9 +57,9 @@ public class TestAuto extends AutoMode {
             else if (Vuforia() == 3) {
                 goDistanceCenter(12, .5);
             }
-            omniPusher.setPosition(1);
+            //omniPusher2.setPosition(1);
             sleep(1000);
-            omniPusher.setPosition(0);
+            //omniPusher2.setPosition(0);
             goDistance(15, -.6, true);
 
 
