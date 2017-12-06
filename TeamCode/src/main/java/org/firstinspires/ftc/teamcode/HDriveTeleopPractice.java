@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -54,6 +55,8 @@ public class HDriveTeleopPractice extends LinearOpMode {
         pusherStop.setMode(DigitalChannel.Mode.INPUT);
         pusherStop2.setMode(DigitalChannel.Mode.INPUT);
         centerMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //leftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        //rightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         //leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         //rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
@@ -186,10 +189,20 @@ public class HDriveTeleopPractice extends LinearOpMode {
             else if (gamepad2.left_bumper) {
                 servoCollectorLt.setPower(-.95);
                 servoCollectorRt.setPower(.95);
-            } else {
+            }
+            else if (gamepad2.x && gamepad2.left_bumper) {
+                servoCollectorLt.setPower(.95);
+                servoCollectorRt.setPower(.95);
+            }
+            else if (gamepad2.b && gamepad2.right_bumper) {
+                servoCollectorLt.setPower(-.95);
+                servoCollectorRt.setPower(-.95);
+            }
+            else {
                 servoCollectorLt.setPower(0);
                 servoCollectorRt.setPower (0);
             }
+
 
             if (gamepad1.dpad_up) {
                 jewelSwiper.setPosition(0);

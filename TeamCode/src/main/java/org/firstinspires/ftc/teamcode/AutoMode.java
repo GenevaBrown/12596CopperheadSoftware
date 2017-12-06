@@ -331,27 +331,27 @@ public abstract class AutoMode extends LinearOpMode {
                            goDistance(29, .7 * direction, false);
                        }
                        else if (vuforiaColumn == 2) {
-                           goDistance(21, .7 * direction, false);
+                           goDistance(24, .7 * direction, false);
                        }
                        else if (vuforiaColumn == 3) {
-                           goDistance(14, .7 * direction, false);
+                           goDistance(20, .7 * direction, false);
                        }
                        else if (vuforiaColumn == -1) {
                            goDistance(29, .7 * direction, false);
                        }
                         sleep(1000);
                         if (!blue) {
-                            goTurn(98, -.7 * direction, false);
+                            goTurn(98, .7, false);
                         }
                         if (blue) {
-                            goTurn(43, -.7 * direction, false);
+                            goTurn(43, .7, false);
                         }
                         sleep(1000);
                         goDistance(18, .7, false);
                         //omnipulatorRt.setPower(0);
                         //omnipulatorLt.setPower(0);
                         omniPusher2.setPower(.8);
-                        sleep(2500);
+                        sleep(2800);
                         omniPusher2.setPower(-.6);
                         sleep(1500);
                         goDistance(3, -.5, false);
