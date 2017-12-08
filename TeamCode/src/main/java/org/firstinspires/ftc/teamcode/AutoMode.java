@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 public abstract class AutoMode extends LinearOpMode {
 
@@ -32,7 +33,7 @@ public abstract class AutoMode extends LinearOpMode {
     //Servo rHDrive;
     CRServo omniPusher;
     CRServo omniPusher2;
-
+    DcMotor lift;
 
     double dropHeight = 0.43;
 
@@ -141,7 +142,7 @@ public abstract class AutoMode extends LinearOpMode {
         right.setPower(0);
     }
 
-    public void goDistance (double distanceToGo, double power, boolean liftCWheel) {
+    public void goDistance (double distanceToGo, double power, boolean liftCWheel, double timeout) {
 
 
         int startPositionLt = 0;
@@ -161,12 +162,10 @@ public abstract class AutoMode extends LinearOpMode {
         startPositionLt = left.getCurrentPosition();
         startPositionRt = right.getCurrentPosition();
         int targetDistance = ((int) ((distanceToGo / (4 * Math.PI) * 1120))/2);
-
+        ElapsedTime Timer = new ElapsedTime();
         double currentPositionLt = left.getCurrentPosition();
         double currentPositionRt = right.getCurrentPosition();
-
         while ((Math.abs(currentPositionLt - startPositionLt) < Math.abs(targetDistance)) && opModeIsActive()) {
-
             telemetry.addData("Current pos L: ", currentPositionLt);
             telemetry.addData("target pos L: ", targetDistance);
             telemetry.addData("error pos: L", Math.abs(targetDistance - currentPositionLt));
@@ -188,6 +187,11 @@ public abstract class AutoMode extends LinearOpMode {
             else {
                 left.setPower(-power);
                 right.setPower(power);
+            }
+            if (Timer.seconds() > timeout) {
+                left.setPower(0);
+                right.setPower(0);
+                break;
             }
 
         }
@@ -328,41 +332,97 @@ public abstract class AutoMode extends LinearOpMode {
                     //omnipulatorLt.setPower(0.6);
                     if (!hDrive) {
                        if (vuforiaColumn == 1) {
-                           goDistance(29, .7 * direction, false);
+                           if (!blue) {
+                               goDistance(29, .7 * direction, false, 20);
+                           }
+                           else if (blue) {
+                               goDistance(50, .7, false, 20);
+                           }
                        }
                        else if (vuforiaColumn == 2) {
-                           goDistance(24, .7 * direction, false);
+                           if (!blue) {
+                               goDistance(21, .7 * direction, false, 20);
+                           }
+                           else if (blue) {
+                               goDistance(54, .7, false, 20);
+                           //changed
+                           }
                        }
                        else if (vuforiaColumn == 3) {
-                           goDistance(20, .7 * direction, false);
+                           if (!blue) {
+                               goDistance(27, .7 * direction, false, 20);
+                           }
+                           else if (blue) {
+                               goDistance(29, .7, false, 20);
+                           }
                        }
                        else if (vuforiaColumn == -1) {
-                           goDistance(29, .7 * direction, false);
+                           if (!blue) {
+                               goDistance(29, .7 * direction, false, 20);
+                           }
+                           else if (blue) {
+                               goDistance(29, .7, false, 20);
+                           }
                        }
                         sleep(1000);
                         if (!blue) {
-                            goTurn(98, .7, false);
+                            if (vuforiaColumn == 3) {
+                                goTurn(67, -.7, false);
+                            }
+                            else {
+                                goTurn(98, -.7, false);
+                            }
                         }
                         if (blue) {
-                            goTurn(43, .7, false);
+                            if (vuforiaColumn == 3) {
+                                goTurn(43, -.7, false);
+                            }
+                            else if (vuforiaColumn == 1) {
+                                goTurn(105, -.7, false);
+                            }
+                            else if (vuforiaColumn == 2) {
+                                goTurn(95, -.7, false);
+                            }
+                            else {
+                                goTurn(43, -.7, false);
+                            }
                         }
                         sleep(1000);
-                        goDistance(18, .7, false);
-                        //omnipulatorRt.setPower(0);
+                        if (blue) {
+                            goDistance(18, .7, false, 5);
+                        }
+                        if (!blue) {
+                            if (vuforiaColumn == 3) {
+                                goDistance(12, 0.7, false, 4);
+                            }
+                            else {
+                                goDistance(15, .7, false, 5);
+                            }
+                        }
+                        /*lift.setPower(.4);
+                        sleep(1500);
+                        lift.setPower(-.4);
+                        sleep(1000);
+                        lift.setPower(0); */
+                        //omnipulatorRt.setP0ower(0);
                         //omnipulatorLt.setPower(0);
                         omniPusher2.setPower(.8);
-                        sleep(2800);
-                        omniPusher2.setPower(-.6);
-                        sleep(1500);
-                        goDistance(3, -.5, false);
+                        goTurn(5, -.5, false);
+                        goTurn(3, .5, false);
+                        sleep(3500);
+                        omniPusher2.setPower(0);
+                        goDistance(4, -.5, false, 8);
                         servoCollectorRt.setPower(.7);
                         servoCollectorLt.setPower(-.7);
                         sleep(1500);
-                        goDistance(10, -.5, false);
+                        servoCollectorLt.setPower(0);
+                        servoCollectorRt.setPower(0);
+                        goDistance(3, .5, false, 3);
+                        goDistance(5, -.5, false, 8);
                         stop();
                     }
                     else {
-                        if (blue && left || !blue && !left) {
+                        /*if (blue && left || !blue && !left) {
                             goDistance(30, .9 * direction, false);
                         }
                         if (blue && !left || !blue && left) {
@@ -381,18 +441,19 @@ public abstract class AutoMode extends LinearOpMode {
                         omniPusher2.setPower(-.6);
                         sleep(1500);
                         goDistance(15, -.6, true);
+                        */
                     }
                 } else {
                     stop();
                 }
                 if (threeGlyphs) {
                     if (blue && !left || !blue && left) {
-                        goDistance(15, -.7, true);
+                        goDistance(15, -.7, true, 20);
                         goTurn(180, .6, true);
-                        goDistance(20, .7, true);
+                        goDistance(20, .7, true, 20);
                         servoCollectorRt.setPower(.9);
                         servoCollectorLt.setPower(.9);
-                        goDistance(5, .7, true);
+                        goDistance(5, .7, true, 10);
                         sleep(3000);
                         servoCollectorRt.setPower(0);
                         servoCollectorLt.setPower(0);
@@ -401,7 +462,7 @@ public abstract class AutoMode extends LinearOpMode {
                         sleep(3000);
                         omnipulatorLt.setPower(0);
                         omnipulatorRt.setPower(0);
-                        goDistance(5, .7, true);
+                        goDistance(5, .7, true, 10);
                         servoCollectorRt.setPower(.9);
                         servoCollectorLt.setPower(.9);
                         sleep(3000);
@@ -430,6 +491,7 @@ public abstract class AutoMode extends LinearOpMode {
         left = hardwareMap.dcMotor.get("L");
         right = hardwareMap.dcMotor.get("R");
         center = hardwareMap.dcMotor.get("C");
+        lift = hardwareMap.dcMotor.get("Lift");
 
         servoCollectorLt = hardwareMap.dcMotor.get("LtCollector");
         servoCollectorRt = hardwareMap.dcMotor.get("RtCollector");
@@ -439,8 +501,8 @@ public abstract class AutoMode extends LinearOpMode {
         left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         center.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        left.setDirection(DcMotorSimple.Direction.REVERSE);
-        right.setDirection(DcMotorSimple.Direction.REVERSE);
+        //left.setDirection(DcMotorSimple.Direction.REVERSE);
+        //right.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
 
@@ -458,6 +520,7 @@ public abstract class AutoMode extends LinearOpMode {
         jewel2 = hardwareMap.servo.get("jewel2");
         omniPusher2 = hardwareMap.crservo.get("pusher2");
         omniPusher = hardwareMap.crservo.get("pusher");
+
 
         IMU.setup(hardwareMap);
 

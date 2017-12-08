@@ -13,7 +13,7 @@ public class BlueRight extends AutoMode {
 
     void runAutoMode () {
         waitForStart();
-        SuperAuto (true, false, true, false, false, false);
+        SuperAuto (true, false, true, false, false, true);
 
     }
 }

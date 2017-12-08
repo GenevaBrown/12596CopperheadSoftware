@@ -27,7 +27,6 @@ public class HDriveTeleopPractice extends LinearOpMode {
     CRServo omniPusher;
     CRServo omniPusher2;
     DcMotor omnipulatorLift;
-    DigitalChannel liftStop;
     DigitalChannel pusherStop;
     DigitalChannel pusherStop2;
     double dropHeight = 0.43;
@@ -48,8 +47,6 @@ public class HDriveTeleopPractice extends LinearOpMode {
         omniPusher = hardwareMap.crservo.get("pusher");
         omniPusher2 = hardwareMap.crservo.get("pusher2");
         omnipulatorLift = hardwareMap.dcMotor.get("Lift");
-        liftStop = hardwareMap.digitalChannel.get("liftStop");
-        liftStop.setMode(DigitalChannel.Mode.INPUT);
         pusherStop = hardwareMap.digitalChannel.get("pusherStop");
         pusherStop2 = hardwareMap.digitalChannel.get("pusherStop2");
         pusherStop.setMode(DigitalChannel.Mode.INPUT);
@@ -68,28 +65,32 @@ public class HDriveTeleopPractice extends LinearOpMode {
         //double servoInitPositionLt = servoCollectorLt.getPosition();
         //double servoInitPositionRt = servoCollectorRt.getPosition();
 
-        jewelSwiper.setPosition(0.1);
+        jewelSwiper.setPosition(0.23);
         jewel2.setPosition(0.95);
 
         waitForStart();
 
         while (opModeIsActive()) {
             telemetry.addData("Jewel Swiper Pos: ", jewelSwiper.getPosition());
-            telemetry.addData("liftStopPos: ", liftStop.getState());
             telemetry.update();
             double jewelSwiperCurrentPos = jewelSwiper.getPosition();
             double jewel2CurrentPos = jewel2.getPosition();
             double omnipulatorLtCurrentPos = omnipulatorLt.getPower();
             double omnipulatorRtCurrentPos = omnipulatorRt.getPower();
+            double left_stick = gamepad1.left_stick_y;
+            double right_stick = gamepad1.right_stick_y;
             //double pusherCurrentPos = omniPusher.getPosition();
             //double pusher2CurrentPos = omniPusher2.getPosition();
             //double servoCurrentPosLt = servoCollectorLt.getPosition();
             //double servoCurrentPosRt = servoCollectorRt.getPosition();
-            if (Math.abs(gamepad1.left_stick_y) > .01) {
+
+
+            if (Math.abs(left_stick) > .01) {
                 /*HDrive.setPower(1);
                 sleep(750);
                 HDrive.setPower(0);*/
-                leftMotor.setPower(gamepad1.left_stick_y);
+                    leftMotor.setPower(processStick(left_stick));
+
             }
             /*if (Math.abs(gamepad1.left_stick_y) > .01 && Math.abs(gamepad1.left_stick_y) < .5) {
                 leftMotor.setPower(gamepad1.left_stick_y / 2);
@@ -112,11 +113,11 @@ public class HDriveTeleopPractice extends LinearOpMode {
             if (Math.abs(gamepad1.right_stick_y) >= .7) {
                 rightMotor.setPower(-gamepad1.right_stick_y);
             }*/
-            if (Math.abs(gamepad1.right_stick_y) > .01) {
+            if (Math.abs(right_stick) > .01) {
                /* HDrive.setPower(1);
                 sleep(750);
                 HDrive.setPower(0); */
-                rightMotor.setPower(-gamepad1.right_stick_y);
+                rightMotor.setPower(-processStick(right_stick));
             }
             else {
                 rightMotor.setPower(0);
@@ -140,12 +141,12 @@ public class HDriveTeleopPractice extends LinearOpMode {
 
             }
             if (gamepad2.right_trigger > .05) {
-                omnipulatorLt.setPower(-.7);
-                omnipulatorRt.setPower(.7);
-            }
-            else if (gamepad2.left_trigger > .05) {
                 omnipulatorLt.setPower(.7);
                 omnipulatorRt.setPower(-.7);
+            }
+            else if (gamepad2.left_trigger > .05) {
+                omnipulatorLt.setPower(-.7);
+                omnipulatorRt.setPower(.7);
             }
             else {
                 omnipulatorLt.setPower(0);
@@ -174,10 +175,10 @@ public class HDriveTeleopPractice extends LinearOpMode {
                 }
             }
             if (gamepad2.dpad_up) {
-                omnipulatorLift.setPower(.7);
+                omnipulatorLift.setPower(.9);
             }
-            else if (gamepad2.dpad_down && liftStop.getState()) {
-                omnipulatorLift.setPower(-.7);
+            else if (gamepad2.dpad_down) {
+                omnipulatorLift.setPower(-.9);
             }
             else {
                 omnipulatorLift.setPower(0);
@@ -190,13 +191,13 @@ public class HDriveTeleopPractice extends LinearOpMode {
                 servoCollectorLt.setPower(-.95);
                 servoCollectorRt.setPower(.95);
             }
-            else if (gamepad2.x && gamepad2.left_bumper) {
+            else if (gamepad2.x) {
                 servoCollectorLt.setPower(.95);
                 servoCollectorRt.setPower(.95);
-            }
-            else if (gamepad2.b && gamepad2.right_bumper) {
-                servoCollectorLt.setPower(-.95);
+                }
+            else if (gamepad2.b) {
                 servoCollectorRt.setPower(-.95);
+                servoCollectorLt.setPower(-.95);
             }
             else {
                 servoCollectorLt.setPower(0);
@@ -228,6 +229,19 @@ public class HDriveTeleopPractice extends LinearOpMode {
 
         }
 
+    }
+    double processStick (double inputStick) {
+        double outputStick = 0;
+        if (Math.abs(inputStick) > .01) {
+
+            if (Math.abs(inputStick) < 0.7) {
+                outputStick = inputStick * 0.4 + (.1 * Math.signum(inputStick));
+            }
+                else {
+                outputStick = inputStick * 2.066 - (1.066 * Math.signum(inputStick)) ;
+            }
+        }
+        return outputStick;
     }
 }
 
