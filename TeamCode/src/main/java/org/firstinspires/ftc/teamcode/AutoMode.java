@@ -343,7 +343,7 @@ public abstract class AutoMode extends LinearOpMode {
                        }
                        else if (vuforiaColumn == 2) {
                            if (!blue) {
-                               goDistance(21, .7 * direction, false, 20);
+                               goDistance(18, .7 * direction, false, 20);
                            }
                            else if (blue) {
                                goDistance(56, .7, false, 20);
@@ -372,7 +372,7 @@ public abstract class AutoMode extends LinearOpMode {
                                 goTurn(67, -.7, false);
                             }
                             else {
-                                goTurn(98, -.7, false);
+                                goTurn(95, -.7, false);
                             }
                         }
                         if (blue) {
@@ -400,7 +400,7 @@ public abstract class AutoMode extends LinearOpMode {
                         lift.setPower(0);
                         sleep(1000);
                         if (blue) {
-                            goDistance(18, .7, false, 5);
+                            goDistance(17, .7, false, 3);
                         }
                         if (!blue) {
                             if (vuforiaColumn == 3) {
@@ -430,7 +430,7 @@ public abstract class AutoMode extends LinearOpMode {
                         sleep(1500);
                         servoCollectorLt.setPower(0);
                         servoCollectorRt.setPower(0);
-                        goDistance(3, .5, false, 3);
+                        goDistance(5, .5, false, 3);
                         goDistance(5, -.5, false, 8);
                         stop();
                     }

@@ -196,12 +196,12 @@ public class HDriveTeleopPractice extends LinearOpMode {
                 omnipulatorLift.setPower(0);
             }
             if (gamepad2.right_bumper) {
-                servoCollectorLt.setPower(.95);
-                servoCollectorRt.setPower(-.95);
-            }
-            else if (gamepad2.left_bumper) {
                 servoCollectorLt.setPower(-.95);
                 servoCollectorRt.setPower(.95);
+            }
+            else if (gamepad2.left_bumper) {
+                servoCollectorLt.setPower(.95);
+                servoCollectorRt.setPower(-.95);
             }
             else if (gamepad2.x) {
                 servoCollectorLt.setPower(.5);
