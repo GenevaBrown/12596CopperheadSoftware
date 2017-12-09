@@ -29,7 +29,11 @@ public class HDriveTeleopPractice extends LinearOpMode {
     DcMotor omnipulatorLift;
     DigitalChannel pusherStop;
     DigitalChannel pusherStop2;
+    ElapsedTime Timer = new ElapsedTime();
     double dropHeight = 0.43;
+    double recordTime = Timer.time();
+    double recordPowerLeft = 0;
+    double recordPowerRight = 0;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -52,6 +56,7 @@ public class HDriveTeleopPractice extends LinearOpMode {
         pusherStop.setMode(DigitalChannel.Mode.INPUT);
         pusherStop2.setMode(DigitalChannel.Mode.INPUT);
         centerMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         //leftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         //rightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         //leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -79,11 +84,18 @@ public class HDriveTeleopPractice extends LinearOpMode {
             double omnipulatorRtCurrentPos = omnipulatorRt.getPower();
             double left_stick = gamepad1.left_stick_y;
             double right_stick = gamepad1.right_stick_y;
+            double maxPowerChange = 0.3;
+            recordPowerLeft = left_stick;
+            recordPowerRight = right_stick;
+            double maxPowerLeft = recordPowerLeft + (maxPowerChange * Math.signum(recordPowerLeft));
+            double maxPowerRight = recordPowerRight + (maxPowerChange * Math.signum(recordPowerRight));
+
+            double currentTime = Timer.time();
+
             //double pusherCurrentPos = omniPusher.getPosition();
             //double pusher2CurrentPos = omniPusher2.getPosition();
             //double servoCurrentPosLt = servoCollectorLt.getPosition();
             //double servoCurrentPosRt = servoCollectorRt.getPosition();
-
 
             if (Math.abs(left_stick) > .01) {
                 /*HDrive.setPower(1);
@@ -192,12 +204,12 @@ public class HDriveTeleopPractice extends LinearOpMode {
                 servoCollectorRt.setPower(.95);
             }
             else if (gamepad2.x) {
-                servoCollectorLt.setPower(.95);
-                servoCollectorRt.setPower(.95);
+                servoCollectorLt.setPower(.5);
+                servoCollectorRt.setPower(.5);
                 }
             else if (gamepad2.b) {
-                servoCollectorRt.setPower(-.95);
-                servoCollectorLt.setPower(-.95);
+                servoCollectorRt.setPower(-.5);
+                servoCollectorLt.setPower(-.5);
             }
             else {
                 servoCollectorLt.setPower(0);

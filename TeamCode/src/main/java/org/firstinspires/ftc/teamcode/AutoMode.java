@@ -146,7 +146,7 @@ public abstract class AutoMode extends LinearOpMode {
 
 
         int startPositionLt = 0;
-        int startPositionRt = 0;
+        //int startPositionRt = 0;
 
         if(liftCWheel == true) {
             //lHDrive.setPosition(0.6);
@@ -154,30 +154,30 @@ public abstract class AutoMode extends LinearOpMode {
             sleep (500);
         }
 
-        if(distanceToGo < 0) {
+        if (distanceToGo < 0) {
             power = -power;
             distanceToGo = Math.abs(distanceToGo);
         }
 
         startPositionLt = left.getCurrentPosition();
-        startPositionRt = right.getCurrentPosition();
+        //startPositionRt = right.getCurrentPosition();
         int targetDistance = ((int) ((distanceToGo / (4 * Math.PI) * 1120))/2);
         ElapsedTime Timer = new ElapsedTime();
         double currentPositionLt = left.getCurrentPosition();
-        double currentPositionRt = right.getCurrentPosition();
+        //double currentPositionRt = right.getCurrentPosition();
         while ((Math.abs(currentPositionLt - startPositionLt) < Math.abs(targetDistance)) && opModeIsActive()) {
             telemetry.addData("Current pos L: ", currentPositionLt);
             telemetry.addData("target pos L: ", targetDistance);
             telemetry.addData("error pos: L", Math.abs(targetDistance - currentPositionLt));
             telemetry.update();
-            telemetry.addData("Current pos: ", currentPositionRt);
-            telemetry.addData("target pos: ", targetDistance);
-            telemetry.addData("error pos: ", Math.abs(targetDistance - currentPositionRt));
+            //telemetry.addData("Current pos: ", currentPositionRt);
+            //telemetry.addData("target pos: ", targetDistance);
+            //telemetry.addData("error pos: ", Math.abs(targetDistance - currentPositionRt));
             telemetry.update();
             currentPositionLt = left.getCurrentPosition();
-            currentPositionRt = right.getCurrentPosition();
+            //currentPositionRt = right.getCurrentPosition();
 
-            if (currentPositionLt > currentPositionRt) {
+            /*if (currentPositionLt > currentPositionRt) {
                 left.setPower(-power * .9);
                 right.setPower(power);
             } else if (currentPositionRt > currentPositionLt) {
@@ -187,7 +187,7 @@ public abstract class AutoMode extends LinearOpMode {
             else {
                 left.setPower(-power);
                 right.setPower(power);
-            }
+            }*/
             if (Timer.seconds() > timeout) {
                 left.setPower(0);
                 right.setPower(0);
@@ -376,6 +376,7 @@ public abstract class AutoMode extends LinearOpMode {
                         if (blue) {
                             if (vuforiaColumn == 3) {
                                 goTurn(43, -.7, false);
+                                telemetry.addData("turn", "");
                             }
                             else if (vuforiaColumn == 1) {
                                 goTurn(105, -.7, false);
