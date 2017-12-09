@@ -145,8 +145,8 @@ public abstract class AutoMode extends LinearOpMode {
     public void goDistance (double distanceToGo, double power, boolean liftCWheel, double timeout) {
 
 
-        int startPositionLt = 0;
-        //int startPositionRt = 0;
+        //int startPositionLt = 0;
+        int startPositionRt = 0;
 
         if(liftCWheel == true) {
             //lHDrive.setPosition(0.6);
@@ -159,24 +159,26 @@ public abstract class AutoMode extends LinearOpMode {
             distanceToGo = Math.abs(distanceToGo);
         }
 
-        startPositionLt = left.getCurrentPosition();
-        //startPositionRt = right.getCurrentPosition();
+        //startPositionLt = left.getCurrentPosition();
+        startPositionRt = right.getCurrentPosition();
         int targetDistance = ((int) ((distanceToGo / (4 * Math.PI) * 1120))/2);
         ElapsedTime Timer = new ElapsedTime();
-        double currentPositionLt = left.getCurrentPosition();
-        //double currentPositionRt = right.getCurrentPosition();
-        while ((Math.abs(currentPositionLt - startPositionLt) < Math.abs(targetDistance)) && opModeIsActive()) {
-            telemetry.addData("Current pos L: ", currentPositionLt);
+        //double currentPositionLt = left.getCurrentPosition();
+        double currentPositionRt = right.getCurrentPosition();
+        while ((Math.abs(currentPositionRt - startPositionRt) < Math.abs(targetDistance)) && opModeIsActive()) {
+            telemetry.addData("Current pos L: ", currentPositionRt);
             telemetry.addData("target pos L: ", targetDistance);
-            telemetry.addData("error pos: L", Math.abs(targetDistance - currentPositionLt));
+            telemetry.addData("error pos: L", Math.abs(targetDistance - currentPositionRt));
             telemetry.update();
             //telemetry.addData("Current pos: ", currentPositionRt);
             //telemetry.addData("target pos: ", targetDistance);
             //telemetry.addData("error pos: ", Math.abs(targetDistance - currentPositionRt));
             telemetry.update();
-            currentPositionLt = left.getCurrentPosition();
+            currentPositionRt = right.getCurrentPosition();
             //currentPositionRt = right.getCurrentPosition();
 
+            left.setPower(-power);
+            right.setPower(power);
             /*if (currentPositionLt > currentPositionRt) {
                 left.setPower(-power * .9);
                 right.setPower(power);
@@ -344,7 +346,7 @@ public abstract class AutoMode extends LinearOpMode {
                                goDistance(21, .7 * direction, false, 20);
                            }
                            else if (blue) {
-                               goDistance(54, .7, false, 20);
+                               goDistance(56, .7, false, 20);
                            //changed
                            }
                        }
@@ -382,12 +384,20 @@ public abstract class AutoMode extends LinearOpMode {
                                 goTurn(105, -.7, false);
                             }
                             else if (vuforiaColumn == 2) {
+                                //sleep(1000);
+                                //telemetry.addData("Turning", "");
+                                //telemetry.update();
+
+                                //sleep(1000);
                                 goTurn(95, -.7, false);
                             }
                             else {
                                 goTurn(43, -.7, false);
                             }
                         }
+                        lift.setPower(0.5);
+                        sleep(750);
+                        lift.setPower(0);
                         sleep(1000);
                         if (blue) {
                             goDistance(18, .7, false, 5);
@@ -408,10 +418,12 @@ public abstract class AutoMode extends LinearOpMode {
                         //omnipulatorRt.setP0ower(0);
                         //omnipulatorLt.setPower(0);
                         omniPusher2.setPower(.8);
+                        omniPusher.setPower(.8);
                         goTurn(5, -.5, false);
                         goTurn(3, .5, false);
                         sleep(3500);
                         omniPusher2.setPower(0);
+                        omniPusher.setPower(0);
                         goDistance(4, -.5, false, 8);
                         servoCollectorRt.setPower(.7);
                         servoCollectorLt.setPower(-.7);
