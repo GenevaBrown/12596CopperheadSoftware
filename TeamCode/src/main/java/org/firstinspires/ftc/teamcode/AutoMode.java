@@ -369,10 +369,10 @@ public abstract class AutoMode extends LinearOpMode {
                         sleep(1000);
                         if (!blue) {
                             if (vuforiaColumn == 3) {
-                                goTurn(67, -.7, false);
+                                goTurn(55, -.7, false);
                             }
                             else {
-                                goTurn(95, -.7, false);
+                                goTurn(94, -.7, false);
                             }
                         }
                         if (blue) {
@@ -396,7 +396,7 @@ public abstract class AutoMode extends LinearOpMode {
                             }
                         }
                         lift.setPower(0.5);
-                        sleep(750);
+                        sleep(1200);
                         lift.setPower(0);
                         sleep(1000);
                         if (blue) {
@@ -404,10 +404,10 @@ public abstract class AutoMode extends LinearOpMode {
                         }
                         if (!blue) {
                             if (vuforiaColumn == 3) {
-                                goDistance(12, 0.7, false, 4);
+                                goDistance(17, 0.7, false, 3);
                             }
                             else {
-                                goDistance(15, .7, false, 5);
+                                goDistance(17, .7, false, 3);
                             }
                         }
                         /*lift.setPower(.4);
@@ -419,8 +419,14 @@ public abstract class AutoMode extends LinearOpMode {
                         //omnipulatorLt.setPower(0);
                         omniPusher2.setPower(.8);
                         omniPusher.setPower(.8);
-                        goTurn(5, -.5, false);
-                        goTurn(3, .5, false);
+                        if (blue) {
+                            goTurn(5, -.5, false);
+                            goTurn(3, .5, false);
+                        }
+                        if (!blue) {
+                            goTurn(5, .5, false);
+                            goTurn(3, -.5, false);
+                        }
                         sleep(3500);
                         omniPusher2.setPower(0);
                         omniPusher.setPower(0);
